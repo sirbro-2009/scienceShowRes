@@ -1,6 +1,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
-mongoose.connect('mongodb+srv://zernikh:zernikh2012@cluster0.bxv6kiu.mongodb.net/schoolSl').then(()=>{
+require('dotenv').config()
+mongoose.connect(process.env.MONGO_URI).then(()=>{
     console.log("connected succes")
 }).catch((e)=>{
     console.log(e)
