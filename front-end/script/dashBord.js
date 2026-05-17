@@ -1,6 +1,5 @@
 //بسم الله الرحمن الرحيم
 let $ = document
-let hoster = ``
 $.querySelector("form").onsubmit = (event)=>{
 $.querySelector("span").className = 'text-transparent'
 event.preventDefault()
@@ -11,7 +10,7 @@ let body = {
     name:name.value.trim(),
     password:password.value.trim()
 }
-fetch(`${hoster}signIn`,{
+fetch(`/signIn`,{
 method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -94,7 +93,7 @@ note:$.getElementById("noteInput").value.trim(),
 mark:$.getElementById("markInput").value.trim(),
 token:ele.token
 }
-fetch(`${hoster}setNote`,{
+fetch(`/setNote`,{
 method: 'PUT',
 headers: {
     'Content-Type': 'application/json'
