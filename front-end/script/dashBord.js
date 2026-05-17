@@ -35,7 +35,7 @@ $.querySelector("span").className = 'text-red-600 text-2xl '
 }
 }
 ////
-if(!localStorage.getItem("token")){
+if(!localStorage.getItem("token") ||localStorage.getItem("token") !=="123456789" ){
 $.getElementById("dashBord").style.display = 'none'
 }
 if(localStorage.getItem("token") ==="123456789"){
@@ -58,7 +58,7 @@ $.getElementById("searchRes").innerHTML = ''
   searchResault()
 }
 function searchResault(){
-fetch(`${hoster}studentList?name=${searchInput.value}`).then(e=>{
+fetch(`/studentList?name=${searchInput.value}`).then(e=>{
   return e.json()}).then((e)=>{
 if(e.length >0){
 e.forEach((ele)=>{

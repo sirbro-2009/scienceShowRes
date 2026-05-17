@@ -1,22 +1,25 @@
 const express = require("express")
-const studentList = require("./studentsList.json")
-const fs = require("fs")
-const { resourceLimits } = require("worker_threads")
-
+const mongoose = require("mongoose")
+mongoose.connect('mongodb+srv://zernikh:zernikh2012@cluster0.bxv6kiu.mongodb.net/schoolSl').then(()=>{
+    console.log("connected succes")
+}).catch((e)=>{
+    console.log(e)
+})
+const students = require("./Data/students")
 const app = express()
 app.use(express.static("./front-end"))
 app.use(express.json())
 app.post("/signIn",(req,res)=>{
     let {name,password} = req.body
-    if(name === "9ayed" && password === "9ayed2027"){return res.json({state:true,token:"123456789"})}
+    if(name === "Roumissa" && password === "Roumissa1448"){return res.json({state:true,token:"123456789"})}
     else{res.json({state:false})}
 })
-app.post("/addStudent",(req,res)=>{
+app.post("/addStudent",async(req,res)=>{
     let {name,gender,theClass,note,mark} = req.body
     let token = Date.now()
     try{
-    studentList.push({...req.body,token:token,note:null,mark:null})
-    fs.writeFileSync('./studentsList.json',JSON.stringify(studentList))
+    const newStudents = new students({...req.body,token:token,note:null,mark:null})
+    await newStudents.save()
     res.json({
         state:true,
         name:name,
@@ -27,28 +30,19 @@ app.post("/addStudent",(req,res)=>{
         res.json({state:false})
     }
 })
-app.get("/studentList",(req,res)=>{
+app.get("/studentList",async(req,res)=>{
 let {name,token,password} = req.query
 if(token){
-
-studentList.forEach(e=>{
-if(`${e.token}` === token){
-return res.json([e])
-}
-
-})
+let fr = await students.find({token:token},{})
+res.json(fr)
 }
 if(name && password){
 try{
-let array = []
 let reqEx = new RegExp(name)
-studentList.forEach((e)=>{
-if((e.name.match(reqEx) && e.password === password)||(e.password === password)){
-array.push(e)
-}
-})
-if(array.length>0){return res.json(array)}
-else if(array.length===0){return res.json({state:false})}
+let fr = await students.find({name:{$regex:name},password:password})
+if(fr.length === 1){
+return res.json(fr)}
+else if(fr.length===0 || fr.length >1){return res.json({state:false})}
 }
 catch{
 return res.json({state:false})
@@ -56,52 +50,22 @@ return res.json({state:false})
 }
 if(name && !password ){
 try{
-let array = []
 let reqEx = new RegExp(name)
-studentList.forEach((e)=>{
-if(e.name.match(reqEx)){
-array.push(e)
+let fr = await students.find({name:{$regex:name}})
+return res.json(fr)
 }
-})
-return res.json(array)
-}
-catch{
+catch(e){
 return res.json({state:false})
 }
 }
 })
-app.delete("/deletStudent",(req,res)=>{
-let {name} = req.query
-    try{
-    studentList.forEach(e,i=>{
-    if(e.name === name){
-    studentList.splice(i,1)
-    fs.writeFileSync('./studentsList.json',JSON.stringify(studentList))
-    return res.json({
-        state:true,
-        name:name
-    })
-    }
-    })
-    }
-    catch{
-        res.json({state:false})
-    }
-})
-app.put("/setNote",(req,res)=>{
+app.put("/setNote",async(req,res)=>{
 let {note,mark,token} = req.body
 try{
-studentList.forEach((e)=>{
-if(e.token === token){
-e.note = note
-e.mark = mark
-}
-})
-fs.writeFileSync("./studentsList.json",JSON.stringify(studentList))
+await students.updateOne({token:token},{$set:{mark:mark,note:note}})
 return res.json({state:true})
 }
 catch(e){
-console.log(e)
 return res.json({state:false})
 }
 })

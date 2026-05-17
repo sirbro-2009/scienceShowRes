@@ -1,6 +1,5 @@
 //بسم الله الرحمن الرحيم
 let $ = document
-let hoster = `https://mathresaultshow.onrender.com/`
 let signUpform = $.getElementById("signUpform")
 let signInForm = $.getElementById("signInForm")
 signInForm.style.display = 'none'
@@ -21,7 +20,7 @@ gender:genderInput.value.trim(),
 password:password.value.trim(),
 theClass:classInput.value.trim(),
 }
-fetch(`${hoster}addStudent`,{
+fetch(`/addStudent`,{
 method: 'POST',
 headers: {
     'Content-Type': 'application/json'
@@ -47,9 +46,10 @@ signInForm.onsubmit = (e)=>{
 e.preventDefault()
 let nameuInput = $.getElementById("nameuInput")
 let passworduInput = $.getElementById("passworduInput")
-fetch(`${hoster}studentList?name=${nameuInput.value.trim()}&password=${passworduInput.value.trim()}`).then(e=>{
+fetch(`/studentList?name=${nameuInput.value.trim()}&password=${passworduInput.value.trim()}`).then(e=>{
   return e.json()}).then(ele=>{
     let e = ele[0]
+    console.log(e,ele)
     if(!e.state){
     localStorage.setItem("token",e.token)
     alert("تم تسجيل دخول بنجاح")
@@ -72,12 +72,14 @@ signInForm.style.display = 'none'
 if(localStorage.getItem("token") && localStorage.getItem("token") !== "123456789"){
 $.getElementById("searchTitle").remove()
 $.querySelectorAll("form").forEach((e)=>{e.style.display = 'none'})
-  console.log(`${hoster}studentList?token=${localStorage.getItem("token")}`)
-fetch(`${hoster}studentList?token=${localStorage.getItem("token")}`).then(e=>{
+fetch(`/studentList?token=${localStorage.getItem("token")}`).then(e=>{
 
   return e.json()}).then(ele=>{
     let e = ele[0]
-
+    if(ele.length === 0){
+      localStorage.removeItem("token")
+      location.reload()
+    }
     let div = $.getElementById("studentProps")
     div.classList = `bg-${e.gender === "male"?`blue-300/50`:`pink-500/50`} flex flex-col  items-center mb-10 justify-center p-2  rounded-xl`
     div.innerHTML = `
