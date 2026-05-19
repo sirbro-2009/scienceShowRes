@@ -12,7 +12,7 @@ app.use(express.static("./front-end"))
 app.use(express.json())
 app.post("/signIn",(req,res)=>{
     let {name,password} = req.body
-    if(name === "Roumissa" && password === "1448"){return res.json({state:true,token:"123456789"})}
+    if(name === process.env.NAME && password === process.env.PASSWORD){return res.json({state:true,token:"123456789"})}
     else{res.json({state:false})}
 })
 app.post("/addStudent",async(req,res)=>{
